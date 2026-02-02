@@ -20,5 +20,8 @@
     "jsonwebtoken": "^9.0.2",
     "mercadopago": "^2.8.0",
     "zod": "^4.0.15"
+  },
+  "devDependencies": {
+    "cross-env": "^10.0.0"
   }
 }
