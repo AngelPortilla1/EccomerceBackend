@@ -9,9 +9,19 @@ const PORT = 3000
 
 
 
-
-app.listen(PORT, () => {
+connectDB().then(() => {
+    app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
+}).catch((error) => {
+    console.error('Failed to connect to the database:', error);
+});
 
-connectDB();
+export const disconnectDN = async() => {
+    try{
+        await mongoose.disconnect();
+        console.log('✅ Base de datos desconectada exitosamente');
+    } catch (error){
+        console.log(' Error al desconectar de mongo db:',error)
+    }
+}

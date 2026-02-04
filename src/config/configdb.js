@@ -1,8 +1,11 @@
 import mongoose from "mongoose";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export const connectDB = async () => {
     try {
-        console.log('🔍 Conectando a MongoDB...');
+        //console.log('🔍 Conectando a MongoDB...');
         
         // Limpiar variables de entorno
         const user = process.env.MONGO_DB_USER?.trim();
