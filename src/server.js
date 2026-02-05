@@ -11,6 +11,9 @@ const app = express()
 
 const PORT = 3000
 
+//MIDDLEWARE para desempaquetar el body
+app.use(express.json())
+app.use(express.urlencoded({extended: true}))
 
 //RUTAS API
 app.use('/api/auth',authRoutes)
