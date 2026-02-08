@@ -30,6 +30,20 @@ export const registerUser = async (req, res) => {
         res.json({message: "Password hashed", hashedPassword });
 
 
+        //Verificar si es admin
+        const isAdmin = (await UserModel.countDocuments()) === 0; // Si no hay usuarios, el primero será admin
+        console.log("¿Es admin?", isAdmin);
+        res.json({ message: "Admin check completed", isAdmin });
+
+
+        //Crear un nuevo usuario 
+        const newUser = await UserModel.create({
+            username,
+            email,
+            password: hashedPassword,
+            role: "user"
+        });
+
     }catch(error) {
         res.json({ error: error.message });
 
