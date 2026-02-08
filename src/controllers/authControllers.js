@@ -1,52 +1,69 @@
 import bcrypt from "bcryptjs";
 import UserModel from "../models/UserModel.js";
 import { registerSchema } from "../schemas/authSchema.js";
+import jwt from "jsonwebtoken";
 
 
 export const registerUser = async (req, res) => {
-    try{
+    try {
         console.log(req.body);
 
-        //Extraer y validar todos los datos del usuario
+        //Validar datos
         const { username, email, password } = registerSchema.parse(req.body);
         console.log(username, email, password);
 
-        //Comprobar si ya existe el usuario por email o username
+        // ¿El usuario ya existe?
         const existingUser = await UserModel.findOne({
             $or: [{ email }, { username }]
         });
-        
+
         if(existingUser){
             return res.status(400).json({ error: "Email or username already exists" });
         }
 
         console.log("Usuario no existe, se puede registrar");
-        //res.json({ message: "User can be registered", username, email });
 
-
-        //Hashear la contraseña
+        // Hashear contraseña
         const hashedPassword = await bcrypt.hash(password, 10);
         console.log("Contraseña hasheada:", hashedPassword);
-        res.json({message: "Password hashed", hashedPassword });
 
-
-        //Verificar si es admin
-        const isAdmin = (await UserModel.countDocuments()) === 0; // Si no hay usuarios, el primero será admin
+        // ¿Es admin? → El primero registrado
+        const isAdmin = (await UserModel.countDocuments()) === 0;
         console.log("¿Es admin?", isAdmin);
-        res.json({ message: "Admin check completed", isAdmin });
 
-
-        //Crear un nuevo usuario 
+        // Crear usuario
         const newUser = await UserModel.create({
             username,
             email,
             password: hashedPassword,
-            role: "user",
-            isAdmin : isAdmin
+            isAdmin
         });
 
-    }catch(error) {
-        res.json({ error: error.message });
+        console.log("Nuevo usuario creado:", newUser);
 
+        // Respuesta final
+        return res.status(201).json({
+            message: "User registered successfully",
+            user: {
+                id: newUser._id,
+                username: newUser.username,
+                email: newUser.email,
+                isAdmin: newUser.isAdmin
+            }
+        });
+
+        //Generar un token con JWT
+        //Payload 
+        const token = jwt.sign(
+            {userId: newUser._id} ,JWT_SECRET,{
+             expiresIn: "1h"      
+
+    })
+
+        
+
+    } catch(error) {
+        console.error(error);
+        return res.status(500).json({ error: error.message });
     }
-}
+};
