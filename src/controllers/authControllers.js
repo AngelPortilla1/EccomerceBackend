@@ -41,7 +41,8 @@ export const registerUser = async (req, res) => {
             username,
             email,
             password: hashedPassword,
-            role: "user"
+            role: "user",
+            isAdmin : isAdmin
         });
 
     }catch(error) {
