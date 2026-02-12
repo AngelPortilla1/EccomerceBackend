@@ -75,8 +75,6 @@ export const registerUser = async (req, res) => {
         res.json({newUser : newUser});
     
 
-     
-
     } catch(error) {
         return res.status(500).json({ error: error.message });
     }
