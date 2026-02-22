@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import UserModel from "../models/UserModel.js";
 import { registerSchema } from "../schemas/authSchema.js";
 import jwt from "jsonwebtoken";
+import { ca } from "zod/locales";
 
 
 export const registerUser = async (req, res) => {
@@ -62,20 +63,111 @@ export const registerUser = async (req, res) => {
         console.log("Token generado:", token);
 
         //Enviar como cookie 
-        res.cookie('accesToken',token,{
+        res.cookie('accessToken',token,{
             httpOnly:true,
             secure:process.env.NODE_ENV === 'PRODUCTION',
-            samesite: process.env.NODE_ENV === 'PRODUCTION'? 'none' : 'lax',  // TRUE
-            MaxAge : 60*60*1000
-
+            sameSite: process.env.NODE_ENV === 'PRODUCTION'? 'none' : 'lax',
+            maxAge : 60*60*1000
         })
 
          //header payload.signature
         console.log(newUser)
-        res.json({newUser : newUser});
+        res.status(201).json({
+            message: "User registered successfully",
+            user: {
+                id: newUser._id,
+                username: newUser.username,
+                email: newUser.email,
+                isAdmin: newUser.isAdmin
+            }
+        });
     
 
     } catch(error) {
         return res.status(500).json({ error: error.message });
     }
 };
+
+export const loginUser = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({ error: "Email and password are required" });
+        }
+
+        // Buscar usuario por email
+        const user = await UserModel.findOne({ email });
+
+        if (!user) {
+            return res.status(401).json({ error: "Invalid credentials" });
+        }
+
+        // Comparar contraseñas
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+
+        if (!isPasswordValid) {
+            return res.status(401).json({ error: "Invalid credentials" });
+        }
+
+        // Generar JWT
+        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+            expiresIn: '1h',
+        });
+
+        console.log("Token generado para login:", token);
+
+        // Enviar como cookie
+        res.cookie('accessToken', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'PRODUCTION',
+            sameSite: process.env.NODE_ENV === 'PRODUCTION' ? 'none' : 'lax',
+            maxAge: 60 * 60 * 1000
+        });
+
+        res.status(200).json({
+            message: "Login successful",
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email,
+                isAdmin: user.isAdmin
+            }
+        });
+
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+};
+
+export const profile = async (req,res) => {
+    // extraer el token de las cookies
+    console.log("Cookies recibidas:", req.cookies);
+    const token = req.cookies.accessToken
+    console.log("Token extraído:", token);
+    
+    if (!token) {
+        return res.status(401).json({ error: "No token provided" });
+    }
+    
+    try {
+        //Decodificar el token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET)
+        console.log("Token decodificado:", decoded);
+
+        // Buscar el usuario en la BD
+        const user = await UserModel.findById(decoded.userId).select("-password");
+        
+        if (!user) {
+            return res.status(404).json({ error: "Usuario no encontrado" });
+        }
+
+        return res.json({
+            user: user,
+        });
+
+    }catch(error){
+        console.log("Error decodificando token:", error.message);
+        return res.status(401).json({ error: "Token inválido o expirado" });
+    }
+}   
