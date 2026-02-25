@@ -162,7 +162,7 @@ export const profile = async (req,res) => {
             return res.status(404).json({ error: "Usuario no encontrado" });
         }
 
-        return res.json({
+        return res.json({ //Completar respuesta full
             user: user,
         });
 
