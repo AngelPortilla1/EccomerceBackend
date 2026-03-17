@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import UserModel from "../models/UserModel.js";
-import { registerSchema } from "../schemas/authSchema.js";
+import { registerSchema,loginSchema } from "../schemas/authSchema.js";
 import jwt from "jsonwebtoken";
 import { ca } from "zod/locales";
 
