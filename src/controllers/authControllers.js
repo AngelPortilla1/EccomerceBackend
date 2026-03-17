@@ -88,8 +88,13 @@ export const registerUser = async (req, res) => {
     }
 };
 
+
 export const loginUser = async (req, res) => {
     try {
+        //obtener la clave secreta del entorno
+        const JWT_SECRET = process.env.JWT_SECRET;
+
+        //Extraer email y password del body
         const { email, password } = req.body;
 
         if (!email || !password) {
