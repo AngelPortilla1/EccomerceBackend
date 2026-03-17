@@ -95,7 +95,7 @@ export const loginUser = async (req, res) => {
         const JWT_SECRET = process.env.JWT_SECRET;
 
         //Extraer email y password del body
-        const { email, password } = req.body;
+        const { email, password } = loginSchema.parse(req.body);
 
         if (!email || !password) {
             return res.status(400).json({ error: "Email and password are required" });
