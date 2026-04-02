@@ -141,6 +141,7 @@ export const loginUser = async (req, res) => {
         });
 
     } catch (error) {
+        //Poner el error con zod
         return res.status(500).json({ error: error.message });
     }
 };
@@ -167,8 +168,14 @@ export const profile = async (req,res) => {
             return res.status(404).json({ error: "Usuario no encontrado" });
         }
 
-        return res.json({ //Completar respuesta full
-            user: user,
+        return res.status(200).json({
+            message: "Profile retrieved successfully",
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email,
+                isAdmin: user.isAdmin
+            }
         });
 
     }catch(error){
@@ -176,3 +183,13 @@ export const profile = async (req,res) => {
         return res.status(401).json({ error: "Token inválido o expirado" });
     }
 }   
+
+
+export const logout = (req, res) => {
+    res.clearCookie('accessToken', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'PRODUCTION',
+        sameSite: process.env.NODE_ENV === 'PRODUCTION' ? 'none' : 'lax',
+    });
+    res.status(200).json({ message: "Cierre de sesion exitoso" });
+}
