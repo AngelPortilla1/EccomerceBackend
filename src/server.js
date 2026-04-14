@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/authRoutes.js'
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import productRoutes from './routes/productRoutes.js';
 
 dotenv.config();
 
