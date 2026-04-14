@@ -31,6 +31,7 @@ app.use(express.urlencoded({extended: true}))
 
 //RUTAS API
 app.use('/api/auth',authRoutes)
+app.use('/api/products',productRoutes)
 
 
 connectDB().then(() => {
