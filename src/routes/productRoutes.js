@@ -16,9 +16,7 @@ router.get('/products/:id', (req, res) => {
 
 
 //rutas privadas (Solo administradores pueden moidifcar productos))
-router.post('/products', (req, res) => {
-    res.json({ message: 'Producto creado' });
-});
+router.post('/products', createProduct);
 
 router.put('/products/:id', (req, res) => {
     const { id } = req.params;
