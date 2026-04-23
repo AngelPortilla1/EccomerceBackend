@@ -48,3 +48,41 @@ export const updateProduct = async (req, res) =>{
         res.json({message:'Error al actualizar el producto', error: error.message})
     }
 }
+
+
+export const getProductById = async (req,res)=>{
+    try{
+        const product = await ProductModel.findById(req.params.id);
+        return res.status(200).json({product});
+
+    }catch (error){
+        return res.status(500).json({message:'Error al obtener el producto', error: error.message})
+
+    }
+}
+
+
+export const getAllProducts = async (req,res)=>{
+    try{
+        const products = await ProductModel.find();
+        return res.status(200).json({products});
+    }catch (error){
+        return res.status(500).json({message:'Error al obtener los productos', error: error.message})
+    } 
+}
+
+
+export const deleteProduct = async (req,res)=>{
+    try{
+        const {id} = req.params;
+        const deletedProduct = await ProductModel.findByIdAndDelete(id);
+
+        if (!deletedProduct) {
+            return res.status(404).json({message:'Producto no encontrado'});
+        }
+
+        return res.status(200).json({message:'Producto eliminado exitosamente', product: deletedProduct});
+    }catch (error){
+        return res.status(500).json({message:'Error al eliminar el producto', error: error.message})
+    }
+}
