@@ -17,10 +17,34 @@ export const createProduct = async (req, res) => {
             imageUrl
         });
 
-        return res.status(201).json(product);
+        return res.status(201).json({messagge:'Producto creado exitosamente', product});
     }catch (error){
-        res.json({message:'Error al crear el producto'})
-
+        if (error instanceof ZodError) {
+            return res.status(400).json({ message: 'Error de validación', errors: error.errors });
+        }
+        return res.status(500).json({message:'Error al crear el producto',error:error.message});
     }
 
 } 
+
+
+export const updateProduct = async (req, res) =>{
+    try{
+        //1. Validar los datos de entrada con Zod
+        const validateData = productSchema.partial().parse(req.body);
+
+        //2. Buscar el producto por ID y actualizarlo
+        const {id} = req.params;
+        const updatedProduct = await ProductModel.findByIdAndUpdate(id, validateData, {new:true,runValidators:true});
+
+        //3. Mamejar el caso de que el producto no existe
+        if (!updatedProduct) {
+            return res.status(404).json({message:'Producto no encontrado'});
+        }
+        return res.status(200).json({message:'Producto actualizado exitosamente', product: updatedProduct});
+
+
+    }catch (error){
+        res.json({message:'Error al actualizar el producto', error: error.message})
+    }
+}

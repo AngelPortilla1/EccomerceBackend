@@ -1,5 +1,5 @@
 import express from 'express';
-import { createProduct } from '../controllers/ProductController.js';
+import { createProduct, updateProduct } from '../controllers/ProductController.js';
 
 const router = express.Router();
 
@@ -18,10 +18,7 @@ router.get('/:id', (req, res) => {
 //rutas privadas (Solo administradores pueden moidifcar productos))
 router.post('/', createProduct);
 
-router.put('/:id', (req, res) => {
-    const { id } = req.params;
-    res.json({ message: `Producto con ID: ${id} actualizado` });
-});
+router.put('/:id', updateProduct);
 
 router.delete('/:id', (req, res) => {
     const { id } = req.params;
