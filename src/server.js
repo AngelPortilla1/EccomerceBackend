@@ -42,12 +42,4 @@ connectDB().then(() => {
     disconnectDB()
 });
 
-connectDB().then(() => {
-    app.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`)
-    })  
-}).catch((error) => {
-    console.error('Error connecting to the database:', error);
-    disconnectDB();
-}
 
